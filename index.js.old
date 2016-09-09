@@ -1,0 +1,118 @@
+var Button = ReactBootstrap.Button;
+var Panel = ReactBootstrap.Panel;
+var FormGroup = ReactBootstrap.FormGroup;
+var ControlLabel = ReactBootstrap.ControlLabel;
+var FormControl = ReactBootstrap.FormControl;
+var Col = ReactBootstrap.Col;
+
+var ContentViewer = React.createClass(
+  {
+    render: function(){
+
+        //let authorList = this.props.author.map(elm => <li>{elm}</li>)
+        //let messageList = this.props.message.map(elm => <li>{elm}</li>)
+
+        return(
+          <ul>
+            {this.props.author}
+            {this.props.message}
+          </ul>
+        );
+
+    }
+  }
+)
+
+var ContentWriter = React.createClass(
+  {
+    getInitialState: function() {
+      return {inputAuthor: "", inputMessage: ``, errors: []}
+    },
+    // 投稿ボタンが押下された時の処理
+    validate: function(){
+      //dispatcher
+      let isValid = this.state.inputAuthor !== "";
+      if (isValid) {
+        this.props.author(this.state.inputAuthor)
+        this.props.message(this.state.inputMessage)
+      } else {
+        this.setState({errors: this.state.errors.concat([{name: "author", message: "invalid value"}])})
+      }
+    },
+    // フォームに値が入力された時の処理
+    authorInput: function(e){
+      this.setState({inputAuthor: e.target.value})
+    },
+    messageInput: function(e){
+      this.setState({inputMessage: e.target.value})
+    },
+    render: function(){
+      let errorSpan = this.state.errors.map(elm => <span>{elm.message}</span>)
+      return (
+        //View ~ UserInteraction
+        <div>
+          <Panel header="新規投稿" bsStyle="primary">
+          <div>
+            <FormGroup>
+              <ControlLabel>投稿者</ControlLabel>
+              <FormControl placeholder="名前を入力" onChange={this.authorInput} />
+            </FormGroup>
+            {errorSpan}
+          </div>
+          <FormGroup controlId="formControlsTextarea">
+            <ControlLabel>投稿内容</ControlLabel>
+            <FormControl componentClass="textarea" placeholder="文字を入力" onChange={this.messageInput} />
+          </FormGroup>
+          <Col xs={11} md={7}>
+          </Col>
+          <Button onClick={this.validate}>投稿</Button>
+          </Panel>
+        </div>
+      )
+    }
+  }
+)
+
+var Application = React.createClass(
+  {
+    getInitialState: function(){
+      return {
+        content:[],
+        author:[],
+        message:[],
+      }
+    },
+    setContent: function(inputAuthor, inputMessage) {
+      if(value != null){
+        this.setState(
+          {
+            content: this.state.content.concat([{author:inputAuthor,message:inputMessage}])
+          }
+        )
+      }
+      return(this.state.content)
+    },
+    setAuthor: function(value) {
+      if(value != null){
+        this.setState({author: this.state.author.concat([value])})
+      }
+    },
+    setMessage: function(value){
+      if(value != null){
+        this.setState({message: this.state.message.concat([value])})
+      }
+    },
+    render: function(){
+      return (
+        <div>
+          <ContentWriter author={this.setAuthor} message={this.setMessage} />
+          <ContentViewer author={this.state.author} message={this.state.message} />
+        </div>
+      )
+    }
+  }
+)
+
+ReactDOM.render( < Application /> ,
+    document.getElementById('container')
+);
